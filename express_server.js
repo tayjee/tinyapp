@@ -27,6 +27,7 @@ function generateRandomString() {
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
+  "Vn2b3s": "http://www.google.ca",
   "9sm5xK": "http://www.google.com"
 };
 
@@ -42,7 +43,6 @@ app.get("/urls", (req, res) => {
 app.post("/urls", (req, res) => {
   let short = generateRandomString()
   urlDatabase[`${short}`] = req.body.longURL
-  console.log(req.body.longURL);
   res.redirect(`/urls/${short}`);
 });
 
@@ -62,6 +62,12 @@ app.get("/u/:shortURL", (req, res) => {
  } else {
   res.send("404 Error Page Not Found")
  }
+});
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect("/urls");
 });
 
 app.get("/urls.json", (req, res) => {
