@@ -11,7 +11,7 @@ app.use(cookieParser())
 app.set("view engine", "ejs");
 
 //Function that generates a random alphanumeric string combination.
-function generateRandomString() {
+function generateRandomString(length) {
   //Array to hold all the alphanumeric values (including both lower and upper case).
     const alphaNumeric = [
     'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e',
@@ -46,7 +46,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  let short = generateRandomString()
+  let short = generateRandomString(6)
   urlDatabase[short] = req.body.longURL
   res.redirect(`/urls/${short}`);
 });
