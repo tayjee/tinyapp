@@ -147,6 +147,12 @@ app.get("/hello", (req, res) => {
   res.render("hello_world", templateVars);
 });
 
+app.get("/login", (req, res) => {
+  let userID = req.cookies.user_id;
+  const templateVars = { user: users[userID] };
+  res.render("login", templateVars);
+});
+
 app.post('/login', (req, res) => {
   let email = req.body.email;
   res.cookie('username', username);
