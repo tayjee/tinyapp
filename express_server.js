@@ -5,15 +5,15 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-const cookieParser = require('cookie-parser')
-app.use(cookieParser())
+const cookieParser = require('cookie-parser');
+app.use(cookieParser());
 
 app.set("view engine", "ejs");
 
 //Function that generates a random alphanumeric string combination.
 function generateRandomString(length) {
   //Array to hold all the alphanumeric values (including both lower and upper case).
-    const alphaNumeric = [
+  const alphaNumeric = [
     'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e',
     'F', 'f', 'G', 'g', 'H', 'h', 'I', 'i', 'J', 'j',
     'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o',
@@ -21,13 +21,22 @@ function generateRandomString(length) {
     'U', 'u', 'V', 'v', 'W', 'w', 'X', 'x', 'Y', 'y',
     'Z', 'z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
     //Empty array to push the random string into
-    const array = [];
-    //Loop with the Math.random function to determine the alphaNumeric index to be pushed into the combined string
-    for (let i = 0; i < length; i++) { 
-        array.push(alphaNumeric[Math.round(Math.random() * 62)]);
+  const array = [];
+  //Loop with the Math.random function to determine the alphaNumeric index to be pushed into the combined string
+  for (let i = 0; i < length; i++) {
+    array.push(alphaNumeric[Math.round(Math.random() * 62)]);
+  }
+  //Joins all the seperate characters into a singular random alphanumeric string.
+  return array.join('');
+}
+
+function matchingEmail(email) {
+  for (let user of Object.values(users)) {
+    if (user.email === email) {
+      return true;
     }
-    //Joins all the seperate characters into a singular random alphanumeric string.
-    return array.join('');
+  }
+  return false;
 }
 
 const urlDatabase = {
@@ -36,18 +45,18 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-const users = { 
+const users = {
   "userRandomID": {
-    id: "userRandomID", 
-    email: "user@example.com", 
+    id: "userRandomID",
+    email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
- "user2RandomID": {
-    id: "user2RandomID", 
-    email: "user2@example.com", 
+  "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
     password: "dishwasher-funk"
   }
-}
+};
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -60,8 +69,8 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  let short = generateRandomString(6)
-  urlDatabase[short] = req.body.longURL
+  let short = generateRandomString(6);
+  urlDatabase[short] = req.body.longURL;
   res.redirect(`/urls/${short}`);
 });
 
@@ -80,17 +89,23 @@ app.get("/register", (req, res) => {
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  let userID = req.cookies_id;
-  const id = generateRandomString(8);
-  users[id] = {id, email, password};
-  /*let userID = generateRandomString(8);
-  console.log(userID);
-  users[userID]["user id"] = userID
-  users[userID]["email"] = email
-  users[userID]["password"] = password
-  console.log(users); */
-  res.cookie('user_id', id);
-  res.redirect('/urls');
+  if (!email || !password) {
+    res.send("400 Bad Request");
+  } else if (matchingEmail(email)) {
+    res.send('400 Email Already Exists');
+  } else {
+    let userID = req.cookies_id;
+    const id = generateRandomString(8);
+    users[id] = {id, email, password};
+    /*let userID = generateRandomString(8);
+    console.log(userID);
+    users[userID]["user id"] = userID
+    users[userID]["email"] = email
+    users[userID]["password"] = password
+    onsole.log(users); */
+    res.cookie('user_id', id);
+    res.redirect('/urls');
+  }
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -102,11 +117,11 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   let userID = req.cookies.user_id;
   let longURL = urlDatabase[req.params.shortURL];
- if (longURL != undefined) {
-  res.redirect(longURL);
- } else {
-  res.send("404 Error Page Not Found")
- }
+  if (longURL != undefined) {
+    res.redirect(longURL);
+  } else {
+    res.send("404 Error Page Not Found");
+  }
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
