@@ -85,6 +85,7 @@ app.post('/register', (req, res) => {
   users[userID]["email"] = email
   users[userID]["password"] = password
   console.log(users); */
+  res.cookie('user_id', id);
   res.redirect('/urls');
 });
 
