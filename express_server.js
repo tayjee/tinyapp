@@ -46,16 +46,11 @@ const urlDatabase = {
 };
 
 const users = {
-  "userRandomID": {
-    id: "userRandomID",
-    email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+  "1234abcd": {
+    id: "1234abcd",
+    email: "1234@abcd.com",
+    password: "test"
   },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk"
-  }
 };
 
 app.get("/", (req, res) => {
