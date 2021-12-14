@@ -75,8 +75,16 @@ app.get("/register", (req, res) => {
 });
 
 app.post('/register', (req, res) => {
-  let email = req.body.email;
-  let password = req.body.password;
+  const email = req.body.email;
+  const password = req.body.password;
+  console.log (email);
+  console.log(password);
+  /*let userID = generateRandomString(8);
+  console.log(userID);
+  users[userID]["user id"] = userID
+  users[userID]["email"] = email
+  users[userID]["password"] = password
+  console.log(users); */
   res.redirect('/urls');
 });
 
