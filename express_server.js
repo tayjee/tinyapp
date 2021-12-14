@@ -77,8 +77,8 @@ app.get("/register", (req, res) => {
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  console.log (email);
-  console.log(password);
+  const id = generateRandomString(8);
+  users[id] = {id, email, password};
   /*let userID = generateRandomString(8);
   console.log(userID);
   users[userID]["user id"] = userID
