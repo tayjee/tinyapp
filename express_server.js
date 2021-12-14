@@ -23,7 +23,7 @@ function generateRandomString() {
     //Empty array to push the random string into
     const array = [];
     //Loop with the Math.random function to determine the alphaNumeric index to be pushed into the combined string
-    for (let i = 0; i < 6; i++) { 
+    for (let i = 0; i < length; i++) { 
         array.push(alphaNumeric[Math.round(Math.random() * 62)]);
     }
     //Joins all the seperate characters into a singular random alphanumeric string.
@@ -53,7 +53,18 @@ app.post("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   const templateVars = { urls: urlDatabase, username: req.cookies.username };
-  res.render("urls_new");
+  res.render("urls_new", templateVars);
+});
+
+app.get("/register", (req, res) => {
+  const templateVars = { urls: urlDatabase, username: req.cookies.username };
+  res.render("registration", templateVars);
+});
+
+app.post('/register', (req, res) => {
+  let email = req.body.email;
+  let password = req.body.password;
+  res.redirect('/urls');
 });
 
 app.get("/urls/:shortURL", (req, res) => {
