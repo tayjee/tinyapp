@@ -39,6 +39,15 @@ function matchingEmail(email) {
   return false;
 }
 
+function loginCheck(email) {
+  for (const user in users) {
+    if (users[user].email === email) {
+      return users[user];
+    }
+  }
+  return false;
+}
+
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "Vn2b3s": "http://www.google.ca",
@@ -46,9 +55,9 @@ const urlDatabase = {
 };
 
 const users = {
-  "1234abcd": {
-    id: "1234abcd",
-    email: "1234@abcd.com",
+  "test1234": {
+    id: "test1234",
+    email: "test@test.com",
     password: "test"
   },
 };
@@ -92,12 +101,6 @@ app.post('/register', (req, res) => {
     let userID = req.cookies_id;
     const id = generateRandomString(8);
     users[id] = {id, email, password};
-    /*let userID = generateRandomString(8);
-    console.log(userID);
-    users[userID]["user id"] = userID
-    users[userID]["email"] = email
-    users[userID]["password"] = password
-    onsole.log(users); */
     res.cookie('user_id', id);
     res.redirect('/urls');
   }
@@ -149,19 +152,27 @@ app.get("/login", (req, res) => {
 });
 
 app.post('/login', (req, res) => {
-  let email = req.body.email;
-  res.cookie('username', username);
+  const email = req.body.email;
+  const password = req.body.password;
+  const login = loginCheck(email);
+  /*
+  console.log(`email = ${email}`);
+  console.log(`password = ${password}`);
+  console.log (`login = ${login}`);
+  console.log(`login.password = ${login.password}`); 
+  */
 
-  for (let user of Object.values(users)) {
-    if (user.email === email) {
-      res.cookie('user_id', user.id);
-    }
+  if (!login || login.password !== password) {
+    res.send("403");
+    return;
   }
+  const id = login.id
+  res.cookie('user_id', id);
   res.redirect('/urls');
 });
 
 app.post('/logout', (req, res) => {
-  res.clearCookie('username');
+  const id = req.body.user_id;
   res.clearCookie('user_id');
   res.redirect('/urls');
 });
