@@ -30,6 +30,7 @@ function generateRandomString(length) {
   return array.join('');
 }
 
+//Function to check if any of the emails in the users object match the inputted email.
 function matchingEmail(email) {
   for (let user of Object.values(users)) {
     if (user.email === email) {
@@ -38,7 +39,7 @@ function matchingEmail(email) {
   }
   return false;
 }
-
+//Function similar to matchingEmail but returns a different output.
 function loginCheck(email) {
   for (const user in users) {
     if (users[user].email === email) {
@@ -47,11 +48,25 @@ function loginCheck(email) {
   }
   return false;
 }
+//Function that returns the URLs where the ID is equal to the currently logged-in user.
+function urlsForUser(id) {
+  const object = {};
+  for (const key in urlDatabase) {
+    if (urlDatabase[key]["userID"] === id) {
+      object[key] = urlDatabase[key];
+    }
+  }
+  return object;
+};
 
 const urlDatabase = {
   "b6UTxQ": {
       longURL: "https://www.tsn.ca",
       userID: "test1234"
+  },
+  "Zw54dW": {
+    longURL: "https://github.com",
+    userID: "test4321"
   },
   "i3BoGr": {
       longURL: "https://www.google.ca",
@@ -65,6 +80,11 @@ const users = {
     email: "test@test.com",
     password: "test"
   },
+  "test4321": {
+    id: "test4321",
+    email: "test2@test.com",
+    password: "test"
+  },
 };
 
 app.get("/", (req, res) => {
@@ -73,7 +93,8 @@ app.get("/", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const userID = req.cookies.user_id;
-  const templateVars = { urls: urlDatabase, user: users[userID] };
+  let filteredURL = urlsForUser(userID);
+  const templateVars = { urls: filteredURL, user: users[userID] };
   res.render("urls_index", templateVars);
 });
 
@@ -140,12 +161,24 @@ app.get("/u/:shortURL", (req, res) => {
 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
+  let userID = req.cookies.user_id;
+
+  if (urlDatabase[shortURL].userID !== String(userID)) {
+    res.send("URL does not belong to you.");
+  }
+
   delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
 
 app.post('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
+  let userID = req.cookies.user_id;
+  
+  if (urlDatabase[shortURL].userID !== String(userID)) {
+    res.send("URL does not belong to you.");
+  }
+
   let newLongURL = Object.values(req.body)[0];
   urlDatabase[shortURL].longURL = newLongURL;
   res.redirect('/urls');
