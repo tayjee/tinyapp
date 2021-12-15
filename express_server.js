@@ -49,9 +49,14 @@ function loginCheck(email) {
 }
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "Vn2b3s": "http://www.google.ca",
-  "9sm5xK": "http://www.google.com"
+  "b6UTxQ": {
+      longURL: "https://www.tsn.ca",
+      userID: "test1234"
+  },
+  "i3BoGr": {
+      longURL: "https://www.google.ca",
+      userID: "test1234"
+  }
 };
 
 const users = {
@@ -67,7 +72,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let userID = req.cookies.user_id;
+  const userID = req.cookies.user_id;
   const templateVars = { urls: urlDatabase, user: users[userID] };
   res.render("urls_index", templateVars);
 });
@@ -78,7 +83,9 @@ app.post("/urls", (req, res) => {
     res.redirect('/login');
   } else {
     let short = generateRandomString(6);
-    urlDatabase[short] = req.body.longURL;
+    const { longURL } = req.body;
+    urlDatabase[short] = {longURL, userID};
+    console.log(urlDatabase);
     res.redirect(`/urls/${short}`);
   }
 });
@@ -118,7 +125,7 @@ app.post('/register', (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   let userID = req.cookies.user_id;
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[userID] };
+  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[userID] };
   res.render("urls_show", templateVars);
 });
 
