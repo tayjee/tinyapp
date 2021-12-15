@@ -163,7 +163,7 @@ app.post('/login', (req, res) => {
   */
 
   if (!login || login.password !== password) {
-    res.send("403");
+    res.send("Incorrect Username or Password");
     return;
   }
   const id = login.id
@@ -172,7 +172,6 @@ app.post('/login', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-  const id = req.body.user_id;
   res.clearCookie('user_id');
   res.redirect('/urls');
 });
