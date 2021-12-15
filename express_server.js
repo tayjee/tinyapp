@@ -73,15 +73,25 @@ app.get("/urls", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  let short = generateRandomString(6);
-  urlDatabase[short] = req.body.longURL;
-  res.redirect(`/urls/${short}`);
+  let userID = req.cookies.user_id;
+  if(userID === undefined) {
+    res.redirect('/login');
+  } else {
+    let short = generateRandomString(6);
+    urlDatabase[short] = req.body.longURL;
+    res.redirect(`/urls/${short}`);
+  }
 });
 
 app.get("/urls/new", (req, res) => {
   let userID = req.cookies.user_id;
   const templateVars = { user: users[userID] };
-  res.render("urls_new", templateVars);
+
+  if(userID === undefined) {
+    res.redirect('/login');
+  } else {
+    res.render("urls_new", templateVars);
+  }
 });
 
 app.get("/register", (req, res) => {
