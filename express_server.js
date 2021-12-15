@@ -28,6 +28,11 @@ const urlDatabase = {
 };
 
 const users = {
+  "abcdefg" : {
+    id: 'abcdefg',
+    email: 'test@test.com',
+    password: 'test' 
+  }
 };
 
 app.get("/", (req, res) => {

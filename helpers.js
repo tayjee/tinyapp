@@ -34,7 +34,7 @@ function getUserByEmail(email, users) {
       return users[user];
     }
   }
-  return false;
+  return undefined;
 }
 //Function that returns the URLs where the ID is equal to the currently logged-in user.
 function urlsForUser(id, database) {
