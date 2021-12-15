@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-
+const bcrypt = require('bcryptjs');
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -78,12 +78,12 @@ const users = {
   "test1234": {
     id: "test1234",
     email: "test@test.com",
-    password: "test"
+    hashedPassword: "test"
   },
   "test4321": {
     id: "test4321",
     email: "test2@test.com",
-    password: "test"
+    hashedPassword: "test"
   },
 };
 
@@ -106,7 +106,6 @@ app.post("/urls", (req, res) => {
     let short = generateRandomString(6);
     const { longURL } = req.body;
     urlDatabase[short] = {longURL, userID};
-    console.log(urlDatabase);
     res.redirect(`/urls/${short}`);
   }
 });
@@ -131,6 +130,7 @@ app.get("/register", (req, res) => {
 app.post('/register', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   if (!email || !password) {
     res.send("400 Bad Request");
   } else if (matchingEmail(email)) {
@@ -138,7 +138,7 @@ app.post('/register', (req, res) => {
   } else {
     let userID = req.cookies_id;
     const id = generateRandomString(8);
-    users[id] = {id, email, password};
+    users[id] = {id, email, hashedPassword};
     res.cookie('user_id', id);
     res.redirect('/urls');
   }
@@ -174,7 +174,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.post('/urls/:id', (req, res) => {
   const shortURL = req.params.id;
   let userID = req.cookies.user_id;
-  
+
   if (urlDatabase[shortURL].userID !== String(userID)) {
     res.send("URL does not belong to you.");
   }
@@ -203,19 +203,16 @@ app.get("/login", (req, res) => {
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = loginCheck(email).hashedPassword
+  const compareSync = bcrypt.compareSync(password, hashedPassword);
   const login = loginCheck(email);
-  /*
-  console.log(`email = ${email}`);
-  console.log(`password = ${password}`);
-  console.log (`login = ${login}`);
-  console.log(`login.password = ${login.password}`); 
-  */
+  const id = login.id
 
-  if (!login || login.password !== password) {
+  if (!login || compareSync === false) {
     res.send("Incorrect Username or Password");
     return;
   }
-  const id = login.id
+
   res.cookie('user_id', id);
   res.redirect('/urls');
 });
