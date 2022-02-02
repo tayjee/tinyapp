@@ -18,27 +18,10 @@ app.use(cookieSession({
 
 //Object to hold the longURL associated with a shortURL and also the user who created the shortened URL.
 const urlDatabase = {
-  "b6UTxQ": {
-    longURL: "https://www.tsn.ca",
-    userID: "test1234"
-  },
-  "Zw54dW": {
-    longURL: "https://github.com",
-    userID: "test4321"
-  },
-  "i3BoGr": {
-    longURL: "https://www.google.ca",
-    userID: "test1234"
-  }
 };
 
 //Object to hold information on the users (id, email, password).
 const users = {
-  "abcdefg" : {
-    id: 'abcdefg',
-    email: 'test@test.com',
-    password: 'test'
-  }
 };
 
 //Function to check if currently logged in user is the same as the user who created the URL
@@ -201,15 +184,13 @@ app.post('/login', (req, res) => {
 
   if (!login) {
     res.status(403).send("User does not exist!");
-    return;
   }
 
   const hashedPassword = getUserByEmail(email, users).hashedPassword;
   const compareSync = bcrypt.compareSync(password, hashedPassword);
 
-  if (!login || compareSync === false) {
+  if (!login || !compareSync) {
     res.send("Incorrect Username or Password");
-    return;
   } else {
     req.session.user_id = login.id;
     res.redirect('/urls');
