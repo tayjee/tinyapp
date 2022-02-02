@@ -100,9 +100,9 @@ app.post('/register', (req, res) => {
   const password = req.body.password;
   const hashedPassword = bcrypt.hashSync(password, 10);
   if (!email || !password) {
-    res.send("400 Bad Request");
+    res.send("You must enter both an email and password!");
   } else if (matchingEmail(email, users)) {
-    res.send('400 Email Already Exists');
+    res.send('Email Already Exists!');
   } else {
     const id = generateRandomString(8);
     users[id] = {id, email, hashedPassword};
@@ -136,6 +136,10 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   let userID = req.session.user_id;
   const shortURL = req.params.shortURL;
+
+  if (!urlDatabase[shortURL]) {
+    res.send("This shortened URL does not exist!");
+  }
 
   if (!currentUser(shortURL, userID)) {
     res.send("You do not own this URL!");
