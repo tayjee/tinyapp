@@ -43,7 +43,7 @@ const users = {
 
 //Routes
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect('/login');
 });
 
 //Main page for users to see the shortened URLs that they created.
@@ -167,24 +167,23 @@ app.get("/login", (req, res) => {
 app.post('/login', (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const hashedPassword = getUserByEmail(email, users).hashedPassword;
-  const compareSync = bcrypt.compareSync(password, hashedPassword);
   const login = getUserByEmail(email, users);
 
-  console.log("login length = " + Object.keys(login).length);
-
-  if (Object.keys(login).length < 0) {
+  if (!login) {
     res.status(403).send("User does not exist!");
     return;
   }
 
+  const hashedPassword = getUserByEmail(email, users).hashedPassword;
+  const compareSync = bcrypt.compareSync(password, hashedPassword);
+
   if (!login || compareSync === false) {
     res.send("Incorrect Username or Password");
     return;
+  } else {
+    req.session.user_id = login.id;
+    res.redirect('/urls');
   }
-
-  req.session.user_id = login.id;
-  res.redirect('/urls');
 });
 
 //Clears cookies and session on logout.
