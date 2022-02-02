@@ -5,7 +5,7 @@ const PORT = 8080; // default port 8080
 const bcrypt = require('bcryptjs');
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
-const {generateRandomString, matchingEmail, getUserByEmail, urlsForUser } = require('./helpers.js');
+const {generateRandomString, matchingEmail, getUserByEmail, urlsForUser} = require('./helpers.js');
 
 app.set("view engine", "ejs");
 
@@ -40,6 +40,15 @@ const users = {
     password: 'test'
   }
 };
+
+//Function to check if currently logged in user is the same as the user who created the URL
+const currentUser = (shortURL, currentID) => {
+  if (urlDatabase[shortURL].userID === currentID) {
+    return true;
+  }
+  return false;
+};
+
 
 //Routes
 app.get("/", (req, res) => {
@@ -105,17 +114,32 @@ app.post('/register', (req, res) => {
 
 app.get("/urls/:shortURL", (req, res) => {
   let userID = req.session.user_id;
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL].longURL, user: users[userID] };
-  res.render("urls_show", templateVars);
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
+
+  if (!currentUser(shortURL, userID)) {
+    res.send("You do not own this URL!");
+    return;
+  } else if (currentUser(shortURL, userID)) {
+    const templateVars = {
+      shortURL: shortURL,
+      longURL: longURL,
+      user: users[userID]
+    };
+    res.render('urls_show', templateVars);
+    return;
+  }
 });
 
 //If user paths to this destination they get redirected to the long URL.
 app.get("/u/:shortURL", (req, res) => {
-  let redirectURL = urlDatabase[req.params.shortURL].longURL;
-  if (redirectURL !== undefined) {
-    res.redirect(redirectURL);
-  } else {
+  const { shortURL } = req.params;
+  let short = urlDatabase[shortURL];
+  if (!short) {
     res.send("404 Error Page Not Found");
+  } else {
+    let redirectURL = short.longURL;
+    res.redirect(redirectURL);
   }
 });
 
