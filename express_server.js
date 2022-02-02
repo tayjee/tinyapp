@@ -115,6 +115,9 @@ app.post('/register', (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   let userID = req.session.user_id;
   const shortURL = req.params.shortURL;
+  if (!urlDatabase[shortURL]) {
+    res.send("This shortened URL does not exist!");
+  }
   const longURL = urlDatabase[shortURL].longURL;
 
   if (!currentUser(shortURL, userID)) {
@@ -131,8 +134,15 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //If user paths to this destination they get redirected to the long URL.
 app.get("/u/:shortURL", (req, res) => {
-  const { shortURL } = req.params;
+  let userID = req.session.user_id;
+  const shortURL = req.params.shortURL;
+
+  if (!currentUser(shortURL, userID)) {
+    res.send("You do not own this URL!");
+  }
+
   let short = urlDatabase[shortURL];
+
   if (!short) {
     res.send("404 Error Page Not Found");
   } else {
