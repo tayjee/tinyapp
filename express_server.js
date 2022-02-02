@@ -151,12 +151,6 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-//Filler page
-app.get("/hello", (req, res) => {
-  const templateVars = { greeting: 'Hello World!' };
-  res.render("hello_world", templateVars);
-});
-
 //Login page
 app.get("/login", (req, res) => {
   let userID = req.session.user_id;
