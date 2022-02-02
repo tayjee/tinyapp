@@ -47,12 +47,5 @@ function urlsForUser(id, database) {
   return object;
 };
 
-//Function to check if currently logged in user is the same as the user who created the URL
-function currentUser(shortURL, currentID) {
-  if (urlDatabase[shortURL].userID === currentID) {
-    return true;
-  }
-  return false;
-};
 
-module.exports = {generateRandomString, matchingEmail, getUserByEmail, urlsForUser, currentUser }
+module.exports = {generateRandomString, matchingEmail, getUserByEmail, urlsForUser }
