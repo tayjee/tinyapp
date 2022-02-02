@@ -41,7 +41,6 @@ const users = {
   }
 };
 
-
 //Routes
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -55,7 +54,6 @@ app.get("/urls", (req, res) => {
   const templateVars = { urls: filteredURL, user: users[userID] };
   res.render("urls_index", templateVars);
 });
-
 
 app.post("/urls", (req, res) => {
   let userID = req.session.user_id;
@@ -100,7 +98,7 @@ app.post('/register', (req, res) => {
     const id = generateRandomString(8);
     users[id] = {id, email, hashedPassword};
     let userID = users[id].id;
-    req.body.user_id = userID;
+    req.session.user_id = userID;
     res.redirect('/urls');
   }
 });
@@ -158,6 +156,7 @@ app.get("/hello", (req, res) => {
   const templateVars = { greeting: 'Hello World!' };
   res.render("hello_world", templateVars);
 });
+
 //Login page
 app.get("/login", (req, res) => {
   let userID = req.session.user_id;
@@ -171,6 +170,13 @@ app.post('/login', (req, res) => {
   const hashedPassword = getUserByEmail(email, users).hashedPassword;
   const compareSync = bcrypt.compareSync(password, hashedPassword);
   const login = getUserByEmail(email, users);
+
+  console.log("login length = " + Object.keys(login).length);
+
+  if (Object.keys(login).length < 0) {
+    res.status(403).send("User does not exist!");
+    return;
+  }
 
   if (!login || compareSync === false) {
     res.send("Incorrect Username or Password");
