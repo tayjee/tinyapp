@@ -119,7 +119,6 @@ app.get("/urls/:shortURL", (req, res) => {
 
   if (!currentUser(shortURL, userID)) {
     res.send("You do not own this URL!");
-    return;
   } else if (currentUser(shortURL, userID)) {
     const templateVars = {
       shortURL: shortURL,
@@ -127,7 +126,6 @@ app.get("/urls/:shortURL", (req, res) => {
       user: users[userID]
     };
     res.render('urls_show', templateVars);
-    return;
   }
 });
 
